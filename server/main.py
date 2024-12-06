@@ -2,6 +2,12 @@ import argparse
 from fastapi import FastAPI
 import uvicorn
 import os
+from db_manager import DBManager
+
+db = DBManager("./db.sqlite3" 
+        if not os.environ.get("production") 
+        else "/app/db.sqlite3")
+
 
 app = FastAPI(
     title="Aspen VPN Server - Coordinator",
@@ -9,7 +15,6 @@ app = FastAPI(
     version="0.1.0",
     middleware=[],
 )
-
 
 # Join the network initially
 # -- Registers their current network location
