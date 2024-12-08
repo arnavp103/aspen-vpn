@@ -2,6 +2,22 @@
 
 Aspen Vpn is a simple VPN setup using wireguard to allow secure access amongst peers in a network. It provides CIDR-based routing, names, and a secure central server to help peers find each other.
 
+## Goals
+Specific Targets:
+- Allow clients on different routers to connect to each other without needing to expose themselves publicly over the internet
+- Allow Peers to be invited to the network using a secure invite system.
+- Verify that the connection is secure, so that even if it is MiTM'ed over the internet it cannot be decrypted. 
+- Allow Peers to be Named and referred to using said names.
+- Allow Peers to be grouped into CIDR ranges for routing purposes.
+
+#### Simplifications from innernet
+
+Skip CIDR-based ACLs
+Skip admin roles
+Skip complex association rules
+Use a simpler invitation flow
+
+
 ## High-Level System Design
 
 The system consists of two main components:
