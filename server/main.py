@@ -63,7 +63,7 @@ async def get_server_info():
 
     return ServerInfo(
         public_key=str(server_public_key),
-        endpoint="127.0.0.1",  # Should be your server's public IP # Change this to localhost for local testing
+        endpoint="192.168.2.113",  # Should be your server's public IP # Change this to localhost for local testing
         port=51820,
         network_cidr="10.0.0.0/24",
     )
