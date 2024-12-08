@@ -48,7 +48,7 @@ async def startup_event():
     # Using 10.0.0.1/24 as our VPN subnet
     wg_server = Server(
         interface_name="wg0",
-        key=private,  # Fixed: key param instead of private_key
+        key=private,
         local_ip="10.0.0.1/24",  # Fixed: local_ip param instead of address
         port=51820,
     )
