@@ -1,3 +1,4 @@
+Activate the virtual environment. 
 In one terminal run:
 
 ```bash

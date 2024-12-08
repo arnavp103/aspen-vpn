@@ -30,18 +30,17 @@ def connect_to_vpn(server_url: str):
     print("Registered with server!", response.json())
 
     # Create WireGuard client interface
-    client = Client(interface_name="wg0", key=private, local_ip="10.0.0.2/24")
+    client = Client(interface_name="wg1", key=private, local_ip="10.0.0.2/24")
 
     # Create server connection
     server_conn = ServerConnection(
         Key(server_info["public_key"]), server_info["endpoint"], server_info["port"]
     )
-    print(f"[client]: server_conn: {server_conn}")
 
     client.set_server(server_conn)
     client.connect()
 
-    print("Connected to VPN!")
+    print("Connected to Aspen VPN!")
     print("Server public key:", server_info["public_key"])
     print("Your public key:", str(public))
 
