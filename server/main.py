@@ -77,9 +77,10 @@ async def register_peer(peer: PeerInfo):
 
     # Create WireGuard client connection
     client = ClientConnection(
-        Key(peer.public_key),  # Fixed: removed kwargs
-        peer.assigned_ip,  # Fixed: removed kwargs
+        Key(peer.public_key),
+        peer.assigned_ip.split("/")[0],  # Just use the IP without CIDR
     )
+    print(f"[server]: client: {client.local_ip}")
 
     # Add to WireGuard interface
     wg_server.add_client(client)
