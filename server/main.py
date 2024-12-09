@@ -24,11 +24,41 @@ db = DatabaseSession()
 with db.get_session() as session:
     Base.metadata.create_all(bind=db.engine)
 
-app = FastAPI(title="Aspen VPN Server")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Initialize WireGuard interface on server start"""
+    global wg_server, server_public_key
+
+    print("Establishing")
+    # Generate server keys
+    private, public = Key.key_pair()
+    server_public_key = public  # Store public key
+
+    print(f"Creating subnet 10.0.0.1/24 on {endpoint}")
+
+    # Create WireGuard interface
+    # Using 10.0.0.1/24 as our VPN subnet
+    wg_server = Server(
+        interface_name="wg0",
+        key=private,
+        local_ip="10.0.0.1/24",
+        port=51820,
+    )
+    wg_server.enable()
+    print("[server]: WireGuard server enabled")
+    yield
+
+    print("[server]: Cleaning up WireGuard server")
+    # Remove interfaces
+    wg_server.disable()
+    wg_server.delete_interface()
 
 wg_server = None  # WireGuard server instance
 server_public_key = None  # Store public key separately
 endpoint = "127.0.0.1"  # Default endpoint upon which server is accessible
+app = FastAPI(title="Aspen VPN Server", lifespan=lifespan)
+
 
 # Security header
 API_KEY_HEADER = APIKeyHeader(name="X-API-Key")
@@ -83,34 +113,6 @@ class ServerInfo(BaseModel):
     network_cidr: str
 
 
-@asynccontextmanager
-async def lifespan():
-    """Initialize WireGuard interface on server start"""
-    global wg_server, server_public_key
-
-    # Generate server keys
-    private, public = Key.key_pair()
-    server_public_key = public  # Store public key
-
-    print(f"Creating subnet 10.0.0.1/24 on {endpoint}")
-
-    # Create WireGuard interface
-    # Using 10.0.0.1/24 as our VPN subnet
-    wg_server = Server(
-        interface_name="wg0",
-        key=private,
-        local_ip="10.0.0.1/24",
-        port=51820,
-    )
-    wg_server.enable()
-    print("[server]: WireGuard server enabled")
-    yield
-
-    print("[server]: Cleaning up WireGuard server")
-    # Remove interfaces
-    wg_server.disable()
-    wg_server.delete_interface()
-
 
 @app.get("/api/server-info", response_model=ServerInfo)
 async def get_server_info():
@@ -147,6 +149,8 @@ async def register_peer(peer: PeerCreate, db: Session = Depends(get_db)):
         Key(peer.public_key),
         peer.assigned_ip.split("/")[0],
     )
+
+
     wg_server.add_client(client)
 
     return db_peer
