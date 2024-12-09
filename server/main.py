@@ -3,6 +3,7 @@ Command line tool to spin up FastAPI server to handle VPN requests
 """
 
 import argparse
+from contextlib import asynccontextmanager
 from typing import List
 
 import uvicorn
@@ -35,8 +36,8 @@ class ServerInfo(BaseModel):
     network_cidr: str
 
 
-@app.on_event("startup")
-async def startup_event():
+@asynccontextmanager
+async def lifespan():
     """Initialize WireGuard interface on server start"""
     global wg_server, server_public_key
 
@@ -53,6 +54,29 @@ async def startup_event():
         port=51820,
     )
     wg_server.enable()
+    yield
+    # Remove interfaces
+    wg_server.disable()
+
+    
+# @app.on_event("startup")
+# async def startup_event():
+#     """Initialize WireGuard interface on server start"""
+#     global wg_server, server_public_key
+
+#     # Generate server keys
+#     private, public = Key.key_pair()
+#     server_public_key = public  # Store public key
+
+#     # Create WireGuard interface
+#     # Using 10.0.0.1/24 as our VPN subnet
+#     wg_server = Server(
+#         interface_name="wg0",
+#         key=private,
+#         local_ip="10.0.0.1/24",  # Fixed: local_ip param instead of address
+#         port=51820,
+#     )
+#     wg_server.enable()
 
 
 @app.get("/api/server-info", response_model=ServerInfo)
