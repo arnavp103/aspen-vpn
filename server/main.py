@@ -182,6 +182,10 @@ async def disable_peer(
     sync_wireguard_peers(db)
     return peer
 
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Aspen VPN Server")
