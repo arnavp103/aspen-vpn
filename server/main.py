@@ -30,7 +30,6 @@ async def lifespan(app: FastAPI):
     """Initialize WireGuard interface on server start"""
     global wg_server, server_public_key
 
-    print("Establishing")
     # Generate server keys
     private, public = Key.key_pair()
     server_public_key = public  # Store public key
@@ -51,7 +50,6 @@ async def lifespan(app: FastAPI):
 
     print("[server]: Cleaning up WireGuard server")
     # Remove interfaces
-    wg_server.disable()
     wg_server.delete_interface()
 
 wg_server = None  # WireGuard server instance
@@ -172,7 +170,6 @@ async def enable_peer(
     peer = peer_crud.toggle_peer_status(db, peer_id, True)
     sync_wireguard_peers(db)
     return peer
-
 
 @app.post("/api/peers/{peer_id}/disable", response_model=PeerInDB)
 async def disable_peer(
