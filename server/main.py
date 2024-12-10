@@ -179,7 +179,7 @@ async def disable_peer(
 ):
     """Disable a peer"""
     peer = peer_crud.toggle_peer_status(db, peer_id, False)
-    sync_wireguard_peers(db)
+    sync_wireguard_peers(db)    
     return peer
 
 @app.get("/")

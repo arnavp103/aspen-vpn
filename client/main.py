@@ -7,6 +7,10 @@ import requests
 from python_wireguard import Client, Key, ServerConnection
 
 
+import gui
+
+exit(1)
+
 def connect_to_vpn(server_url: str):
     """Connect to VPN server"""
     # Get server info
