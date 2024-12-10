@@ -22,7 +22,7 @@ if [ "$1" == "server" ]; then
     sed -i "s|<client-public-key>|$client_public_key|g" ./wg0s/server/wg0.conf
 
     # Move wg0.conf to /etc/wireguard/
-    sudo mv ./wg0s/server/wg0.conf /etc/wireguard/
+    sudo cp ./wg0s/server/wg0.conf /etc/wireguard/
     echo "Type Server - Moved wg0.conf to /etc/wireguard/"
 fi
 
@@ -48,6 +48,6 @@ if [ "$1" == "client" ]; then
     sed -i "s|<server-ip>|$2|g" ./wg0s/client/wg0.conf
 
     # Move wg0.conf to /etc/wireguard/
-    sudo mv ./wg0s/client/wg0.conf /etc/wireguard/
+    sudo cp ./wg0s/client/wg0.conf /etc/wireguard/
     echo "Type Client - Moved wg0.conf to /etc/wireguard/"
 fi
