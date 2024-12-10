@@ -3,8 +3,8 @@
 from datetime import datetime, timezone
 import secrets
 from typing import Optional
-from sqlalchemy import Boolean, String, DateTime, Text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Boolean, String, DateTime, Text, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .session import Base
 
@@ -38,6 +38,11 @@ class Peer(Base):
         onupdate=datetime.now(timezone.utc),
     )
 
+    # Relationship to IP allocation
+    ip_allocation: Mapped["IPAllocation"] = relationship(
+        back_populates="peer", uselist=False
+    )
+
     @staticmethod
     def generate_api_key():
         """Generate a random API key"""
@@ -46,3 +51,18 @@ class Peer(Base):
     def update_last_seen(self) -> None:
         """Update last seen timestamp"""
         self.last_seen = datetime.now(timezone.utc)
+
+
+class IPAllocation(Base):
+    """IP address allocation"""
+
+    __tablename__ = "ip_allocations"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    ip_address: Mapped[str] = mapped_column(String, unique=True, index=True)
+    peer_id: Mapped[Optional[int]] = mapped_column(ForeignKey("peers.id"), unique=True)
+    is_reserved: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    # Relationship to peer
+    peer: Mapped[Optional["Peer"]] = relationship(back_populates="ip_allocation")
