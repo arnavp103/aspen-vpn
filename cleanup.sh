@@ -13,6 +13,7 @@ remove_interface() {
 # Remove both server and client interfaces
 remove_interface "wg0"
 remove_interface "wg1"
+remove_interface "VPN"
 
 # Optionally, kill any running server processes
 sudo pkill -f "python server/main.py"
