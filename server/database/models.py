@@ -66,3 +66,33 @@ class IPAllocation(Base):
 
     # Relationship to peer
     peer: Mapped[Optional["Peer"]] = relationship(back_populates="ip_allocation")
+
+
+class Invite(Base):
+    """Invite model for database"""
+
+    __tablename__ = "invites"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    code: Mapped[str] = mapped_column(String, unique=True)
+    expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    used_by: Mapped[Optional[int]] = mapped_column(ForeignKey("peers.id"), nullable=True)
+    last_modified: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.now(timezone.utc),
+        onupdate=datetime.now(timezone.utc),
+    )
+
+    @staticmethod
+    def generate_code() -> str:
+        """Generate a random invite code"""
+        return secrets.token_urlsafe(32)
+
+    def is_expired(self) -> bool:
+        """Check if invite is expired"""
+        return self.expires_at is not None and self.expires_at < datetime.utcnow()
+
+    def decrement_uses(self) -> None:
+        """Decrement uses of invite"""
+        self.max_uses -= 1

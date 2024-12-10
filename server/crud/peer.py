@@ -59,7 +59,7 @@ def toggle_peer_status(db: Session, peer_id: int, enable: bool) -> Peer:
     peer = get_peer(db, peer_id)
     peer.is_enabled = enable
     if enable:
-        peer.last_seen = datetime.utcnow()
+        peer.last_seen = datetime.now(datetime.timezone.utc)
     db.commit()
     db.refresh(peer)
     return peer
